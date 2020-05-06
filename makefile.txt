@@ -1,4 +1,4 @@
-artifact: 
+artifact:
 	dependencies:	( intro, content, outro )
 
 intro:

@@ -1,19 +1,31 @@
-BEGIN {
-    RS = "\n\n"; ORS = "\n";
-    FS = "\t"; OFS = "";
-    output = "script.sh"
 
+BEGIN {
+    RS = "\n\n";
+    FS = "\t";
+    output = "script.sh"
     print "#!/bin/bash\n" > output
 }
 
 {
-    gsub(/\n/, "")
-    gsub(/ /, "")
-    gsub(/:/, "=")
-    gsub(/,/, " ")
-    print toupper($1) $3 >> output
+    target = ""
+    sub(":", "", $1)
+    target = $1
 }
 
+{
+    sub("\\ )", "", $3)
+    sub("\\( ", "", $3)
+    split($3, dep, ", ")
+    for (i in dep) {
+        hierarchy[target][i] = dep[i]
+    }
+}
 END {
-    # final script
+    for(i in hierarchy)
+    {
+        for(a in hierarchy[i])
+        {
+            print hierarchy[i][a]
+        }
+    }
  }
