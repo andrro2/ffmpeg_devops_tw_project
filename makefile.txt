@@ -1,24 +1,11 @@
-artifact: dependency1 dependency2 dependecy3
-	ffmpeg -i dependency1 -i dependency2 -i dependency3 concat -y artifact
+artifact: 
+	dependencies:	( intro, content, outro )
 
-dependency1: 
-	name: intro
-dependencies: [ dependency4, dependency5 ] 
-	ffmpeg -i dependency4 -i dependency5 concat -y dependency1
+intro:
+	dependencies:	( dependency4, dependency5 )
 
-dependency2:
-	name: content
+content:
+	dependencies:	( dependency6, dependency7 )
 
-dependency3: 
-	name: outro
-dependencies: [ dependency6, dependency7 ]
-ffmpeg -i dependency6 -i dependency7 concat -y dependency3
-
-dependency4:
-
-dependency5:
-
-
-
-
-
+outro:
+	dependencies:	( dependency8, dependency9 )
