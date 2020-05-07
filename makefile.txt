@@ -1,15 +1,4 @@
 artifact:
-	dependencies:	( intro, content, outro )
-	steps:	( echo "build artifact -dep intro -dep content -dep outro", echo "artifact step2" )
+	dependencies:	( main.mp4, logo.png )
+	steps:	( ffmpeg -i sources/main.mp4 -i sources/logo.png -filter_complex "overlay=10:10" test1.mp4 )
 
-intro:
-	dependencies:	( dependency4, dependency5 )
-	steps:	( echo "build intro -dep dependency4 -dep dependency5" )
-
-content:
-	dependencies:	( dependency6, dependency7 )
-	steps:	( echo "build intro -dep dependency6 -dep dependency7" )
-
-outro:
-	dependencies:	( dependency8, dependency9 )
-	steps:	( echo "build intro -dep dependency8 -dep dependency9" )
