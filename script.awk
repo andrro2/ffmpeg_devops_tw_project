@@ -112,8 +112,8 @@ END {
     write_shell_script(hierarchy)
 
     print "inotifywait sources/ -e close_write | \n" \
-    "while read path action file; do \n"\
+    "while read -r path action file; do \n"\
     "    ARG=$file \n"\
     "done \n" \
-    "./script.sh $ARG" >> output
+    "./start_build.sh " changed_file >> output
 }
