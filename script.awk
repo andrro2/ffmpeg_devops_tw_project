@@ -22,11 +22,11 @@ function write_shell_script(array) {
         tempstring2 = ""
         if(artifact != "artifact"){
             print "\t"artifact")" >> output
-            recursive(array, artifact)
-            for(stepindex in array["artifact"]["steps"])
-            {
-                print "\t\t"array["artifact"]["steps"][stepindex] >> output
-            }
+            recursivedep(array, "artifact", artifact)
+#            for(stepindex in array["artifact"]["steps"])
+#            {
+#                print "\t\t"array["artifact"]["steps"][stepindex] >> output
+#            }
             print "\t\t;;" >> output
         }
         for (qdep in array[artifact]["deps"])

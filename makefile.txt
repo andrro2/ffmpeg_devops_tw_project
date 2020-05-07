@@ -4,15 +4,15 @@ artifact:
 
 a:
 	dependencies:	( b )
-	steps:	( echo build artifact -d e )
+	steps:	( echo build artifact -d b )
 
 b:
 	dependencies:	( c )
-	steps:	( echo build artifact -d f )
+	steps:	( echo build artifact -d c )
 
 c:
 	dependencies:	( d )
-	steps:	( echo build artifact -d f )
+	steps:	( echo build artifact -d d )
 
 d:
 	dependencies:	( g )
