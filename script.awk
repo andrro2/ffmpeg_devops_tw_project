@@ -1,3 +1,9 @@
+function array_values(array, before, after) {
+    target = ""
+    for (key in array) {
+        target = target before array[key] after
+    } return target
+}
 
 function in_array(value, array) {
     is_in_array = 0
@@ -5,16 +11,14 @@ function in_array(value, array) {
         if (array[i] == value) {
             is_in_array = 1
         }
-    }
-    return is_in_array
+    } return is_in_array
 }
 
 function write_shell_script(array) {
     print "CHANGED_DEP=$1\ncase $CHANGED_DEP in" >> output
     split("", artifact_steps)
 
-    # GET ARTIFACT STEPS
-
+    # COLLECT ARTIFACT STEPS
     for (artifact in array) {
         if (artifact == "artifact") {
             for (step_index in array[artifact]["steps"]) {
@@ -23,21 +27,19 @@ function write_shell_script(array) {
         }
     }
 
-    # GET FURTHER DEPENDENCIES AND STEPS
-
+    # GET MAIN DEPENDENCIES AND STEPS
     for (artifact in array) {
         if (artifact != "artifact") {
             print "\t" artifact ")" >> output
             for (step_index in array[artifact]["steps"]) {
                 print "\t\t"array[artifact]["steps"][step_index] >> output
             }
-            for (as in artifact_steps) {
-                print "\t\t" artifact_steps[as] >> output
-            }
+            printf array_values(artifact_steps, "\t\t", "\n") >> output
             print "\t\t;;" >> output
         }
     }
 
+    # GET FURTHER DEPENDENCIES AND STEPS
     split("", dependency_steps)
     for(artifact in array) {
         if (artifact != "artifact") {
@@ -51,25 +53,15 @@ function write_shell_script(array) {
                         dependency_steps[length(dependency_steps)] = the_real_step
                     }
                 }
-                for (as in artifact_steps) {
-                    print "\t\t" artifact_steps[as] >> output
-                }
+                printf array_values(artifact_steps, "\t\t", "\n") >> output
                 print "\t\t;;" >> output
             }
         }
     }
-
     print "\t*)" >> output
-
-    for (ds in dependency_steps) {
-        print "\t\t" dependency_steps[ds] >> output
-    }
-    for (as in artifact_steps) {
-        print "\t\t" artifact_steps[as] >> output
-    }
-
+    printf array_values(dependency_steps, "\t\t", "\n") >> output
+    printf array_values(artifact_steps, "\t\t", "\n") >> output
     print "\t\t;;\nesac\n" >> output
-
 }
 
 BEGIN {
