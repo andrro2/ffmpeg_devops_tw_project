@@ -31,11 +31,11 @@ function write_shell_script(array) {
         }
         for (qdep in array[artifact]["deps"])
         {
-            
+
             if(!(array[artifact]["deps"][qdep] in array))
             {
                 print "\t"array[artifact]["deps"][qdep]")" >> output
-                recursivedep(array, artifact, array[artifact]["deps"][qdep])
+                recursivedep(array, "artifact", array[artifact]["deps"][qdep])
                 print "\t\t;;" >> output
             }
         }
@@ -71,28 +71,30 @@ function recursive(recarray, recelement)
 
 function recursivedep(recarray2, recelement2, recdep)
 {
-    isfound=0
-    print recdep
     print recelement2
-    print (!(recdep in recarray2[recelement2]["deps"]))
-    if(!(recdep in recarray2[recelement2]["deps"]))
+    print recdep
+    isfound = 0
+    if(in_array(recdep, recarray2[recelement2]["deps"]))
     {
-        print "furok"
-        for(recart in recarray2[recelement2]["deps"])
-        {
-            isfound = recursive(recarray, recarray2[recelement2]["deps"][recart])
-        }
-        
+        print "megvan"
+        isfound = 1
     }
     else
     {
-        print huha
-        isfound = 1
-    }
-    if(isfound){
-    for(stepelement2 in recarray2[recelement2]["steps"])
+        for(recart2 in recarray2[recelement2]["deps"])
         {
-            print "\t\t"recarray2[recelement2]["steps"][stepelement2] >> output
+            if(recarray2[recelement2]["deps"][recart2] in recarray2)
+            {
+                print "megint"
+                isfound = recursivedep(recarray2, recarray2[recelement2]["deps"][recart2], recdep)
+            }
+        }
+    }
+    if(isfound)
+    {
+        for(recstep2 in recarray2[recelement2]["steps"])
+        {
+            print "\t\t"recarray2[recelement2]["steps"][recstep2] >> output
         }
     }
     return isfound

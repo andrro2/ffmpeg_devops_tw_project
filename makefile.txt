@@ -1,19 +1,20 @@
 artifact:
-	dependencies:	( intro_b.webm, main.mp4, logo.png, outro_b.webm )
-	steps:	( ffmpeg -i sources/main.mp4 -i sources/logo.png -filter_complex "overlay=10:10" test1.mp4 )
+	dependencies:	( a )
+	steps:	( echo build artifact -d a ,b ,c )
 
-intro_b.webm:
-	dependencies:	( intro.webm, intro.opus )
-	steps:	( ffmpeg -i sources/intro.webm -i sources/intro.opus -c copy -map 0:v:0 -map 1:a:0 sources/intro_b.webm )
+a:
+	dependencies:	( b )
+	steps:	( echo build artifact -d e )
 
-outro_b.webm:
-	dependencies:	( outro.webm, outro.opus )
-	steps:	( ffmpeg -i sources/out.webm -i sources/outro.opus -c copy -map 0:v:0 -map 1:a:0 sources/outro_b.webm )
+b:
+	dependencies:	( c )
+	steps:	( echo build artifact -d f )
 
-outro.opus:
-	dependencies:	( intro.mp3 )
-	steps:	( ffmpeg -i sources/intro.mp3 sources/outro.opus )
+c:
+	dependencies:	( d )
+	steps:	( echo build artifact -d f )
 
-intro.opus:
-	dependencies:	( outro.mp3 )
-	steps:	( ffmpeg -i sources/outro.mp3 sources/intro.opus )
+d:
+	dependencies:	( g )
+	steps:	( echo build artifact -d g )
+
