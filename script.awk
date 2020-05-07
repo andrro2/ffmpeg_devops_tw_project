@@ -16,52 +16,86 @@ function in_array(value, array) {
 
 function write_shell_script(array) {
     print "CHANGED_DEP=$1\ncase $CHANGED_DEP in" >> output
-    split("", artifact_steps)
-
-    # COLLECT ARTIFACT STEPS
-    for (artifact in array) {
-        if (artifact == "artifact") {
-            for (step_index in array[artifact]["steps"]) {
-                artifact_steps[length(artifact_steps)] = array[artifact]["steps"][step_index]
+    
+    for (artifact in array)
+    {
+        tempstring2 = ""
+        if(artifact != "artifact"){
+            print "\t"artifact")" >> output
+            recursive(array, artifact)
+            for(stepindex in array["artifact"]["steps"])
+            {
+                print "\t\t"array["artifact"]["steps"][stepindex] >> output
             }
-        }
-    }
-
-    # GET MAIN DEPENDENCIES AND STEPS
-    for (artifact in array) {
-        if (artifact != "artifact") {
-            print "\t" artifact ")" >> output
-            for (step_index in array[artifact]["steps"]) {
-                print "\t\t"array[artifact]["steps"][step_index] >> output
-            }
-            printf array_values(artifact_steps, "\t\t", "\n") >> output
             print "\t\t;;" >> output
         }
-    }
-
-    # GET FURTHER DEPENDENCIES AND STEPS
-    split("", dependency_steps)
-    for(artifact in array) {
-        if (artifact != "artifact") {
-            for(dep_index in array[artifact]["deps"]) {
-                print "\t" array[artifact]["deps"][dep_index] ")" >> output
-                for (step_index in array[artifact]["steps"]) {
-                    the_real_step = array[artifact]["steps"][step_index]
-                    print "\t\t" the_real_step >> output
-
-                    if (in_array(the_real_step, dependency_steps) == 0) {
-                        dependency_steps[length(dependency_steps)] = the_real_step
-                    }
-                }
-                printf array_values(artifact_steps, "\t\t", "\n") >> output
+        for (qdep in array[artifact]["deps"])
+        {
+            
+            if(!(array[artifact]["deps"][qdep] in array))
+            {
+                print "\t"array[artifact]["deps"][qdep]")" >> output
+                recursivedep(array, artifact, array[artifact]["deps"][qdep])
                 print "\t\t;;" >> output
             }
         }
+        
     }
-    print "\t*)" >> output
-    printf array_values(dependency_steps, "\t\t", "\n") >> output
-    printf array_values(artifact_steps, "\t\t", "\n") >> output
-    print "\t\t;;\nesac\n" >> output
+    for(artifact in array){
+    if(artifact == "artifact")
+        {
+            print "\t*)" >> output
+            recursive(array, artifact)
+            print "\t\t;;" >> output
+        }
+    }
+    
+
+    print "esac\n" >> output
+}
+
+function recursive(recarray, recelement)
+{
+    if(recelement in recarray)
+    {
+        for(relement in recarray[recelement]["deps"])
+        {
+            recursive(recarray, recarray[recelement]["deps"][relement])
+        }
+        for(stepelement in recarray[recelement]["steps"])
+        {
+            print "\t\t"recarray[recelement]["steps"][stepelement] >> output
+        }
+    }
+}
+
+function recursivedep(recarray2, recelement2, recdep)
+{
+    isfound=0
+    print recdep
+    print recelement2
+    print (!(recdep in recarray2[recelement2]["deps"]))
+    if(!(recdep in recarray2[recelement2]["deps"]))
+    {
+        print "furok"
+        for(recart in recarray2[recelement2]["deps"])
+        {
+            isfound = recursive(recarray, recarray2[recelement2]["deps"][recart])
+        }
+        
+    }
+    else
+    {
+        print huha
+        isfound = 1
+    }
+    if(isfound){
+    for(stepelement2 in recarray2[recelement2]["steps"])
+        {
+            print "\t\t"recarray2[recelement2]["steps"][stepelement2] >> output
+        }
+    }
+    return isfound
 }
 
 BEGIN {
@@ -98,14 +132,14 @@ BEGIN {
 }
 
 END {
-    for(artifact in hierarchy) {
-        for(dependency in hierarchy[artifact]["steps"]) {
-            print hierarchy[artifact]["steps"][dependency]
-        }
-        for(dependency in hierarchy[artifact]["deps"]) {
-            print hierarchy[artifact]["deps"][dependency]
-        }
-    }
+#    for(artifact in hierarchy) {
+#        for(dependency in hierarchy[artifact]["steps"]) {
+#            print hierarchy[artifact]["steps"][dependency]
+#        }
+#        for(dependency in hierarchy[artifact]["deps"]) {
+#            print hierarchy[artifact]["deps"][dependency]
+#        }
+#    }
 
     print "ENNYI VAN: " dependencies
 
