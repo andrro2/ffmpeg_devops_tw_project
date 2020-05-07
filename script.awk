@@ -1,62 +1,75 @@
 
+function in_array(value, array) {
+    is_in_array = 0
+    for (i in array) {
+        if (array[i] == value) {
+            is_in_array = 1
+        }
+    }
+    return is_in_array
+}
+
 function write_shell_script(array) {
     print "CHANGED_DEP=$1\ncase $CHANGED_DEP in" >> output
+    split("", artifact_steps)
+
+    # GET ARTIFACT STEPS
 
     for (artifact in array) {
-        print "\t" artifact ")" >> output
-        for (step_index in array[artifact]["steps"]) {
-            print "\t\t"array[artifact]["steps"][step_index] >> output
+        if (artifact == "artifact") {
+            for (step_index in array[artifact]["steps"]) {
+                artifact_steps[length(artifact_steps)] = array[artifact]["steps"][step_index]
+            }
         }
-        print "\t\t;;" >> output
     }
 
+    # GET FURTHER DEPENDENCIES AND STEPS
+
+    for (artifact in array) {
+        if (artifact != "artifact") {
+            print "\t" artifact ")" >> output
+            for (step_index in array[artifact]["steps"]) {
+                print "\t\t"array[artifact]["steps"][step_index] >> output
+            }
+            for (as in artifact_steps) {
+                print "\t\t" artifact_steps[as] >> output
+            }
+            print "\t\t;;" >> output
+        }
+    }
+
+    split("", dependency_steps)
     for(artifact in array) {
         if (artifact != "artifact") {
             for(dep_index in array[artifact]["deps"]) {
                 print "\t" array[artifact]["deps"][dep_index] ")" >> output
                 for (step_index in array[artifact]["steps"]) {
-                    print "\t\t"array[artifact]["steps"][step_index] >> output
+                    the_real_step = array[artifact]["steps"][step_index]
+                    print "\t\t" the_real_step >> output
+
+                    if (in_array(the_real_step, dependency_steps) == 0) {
+                        dependency_steps[length(dependency_steps)] = the_real_step
+                    }
+                }
+                for (as in artifact_steps) {
+                    print "\t\t" artifact_steps[as] >> output
                 }
                 print "\t\t;;" >> output
             }
         }
     }
 
-
     print "\t*)" >> output
 
-    split("", checked_deps)
-
-    i = 0
-    searched_element = ""
-    while (i < dependencies) {
-        for (artifact in array) {
-            for (dependency_index in array[artifact]["deps"]) {
-                if (!(array[artifact]["deps"][dependency_index] in checked_deps) || searched_element == "") {
-                    searched_element = array[artifact]["deps"][dependency_index]
-                    print "searched_element: " searched_element
-                    print "amúgym eg itt tartunk: " array[artifact]["deps"][dependency_index]
-                }
-
-                if (searched_element in array) {
-
-                }
-                else if (!(searched_element in checked_deps)) {
-                    print "töltődik a checked"
-                    checked_deps[length(checked_deps)] = searched_element
-                    print i
-                    i++
-                }
-            }
-        }
-
-        print "\nEZ VAN A CHECKED DEPSBEN:\n"
-        for (checked in checked_deps) {
-            print checked_deps[checked]
-        }
+    for (ds in dependency_steps) {
+        print "\t\t" dependency_steps[ds] >> output
+    }
+    for (as in artifact_steps) {
+        print "\t\t" artifact_steps[as] >> output
     }
 
-    print "\t\t;;\nesac" >> output
+    print "\t\t;;\nesac\n" >> output
+
 }
 
 BEGIN {
